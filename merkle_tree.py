@@ -75,6 +75,7 @@ class MerkleTree:
     
     def calculate_proof(self, elem) -> list[str]:
         # find index of element
+        # TODO: we don't need the index, but we need to check inclusion, fix this
         try:
             index = self.values.index(elem)
         except ValueError:
