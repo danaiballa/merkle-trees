@@ -131,8 +131,9 @@ class MerkleTree:
         right_root = other_tree.root
         parent = create_parent(left_root, right_root)
         self.root = parent
-        # TODO: do we need to return new root?
-        return parent
+        self.leaves += other_tree.leaves
+        self.values += other_tree.values
+        self.non_dummy += other_tree.non_dummy
     
     def add_value(self, value: str):
         '''
