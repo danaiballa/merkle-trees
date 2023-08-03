@@ -3,12 +3,18 @@ import math
 
 
 def hash(m: str) -> str:
+    '''
+    SHA256 hash of a string.
+    '''
     h = hashlib.sha256()
     h.update(bytes(m, 'utf-8'))
     return str(h.digest().hex())
 
 
 def verify_proof(val: str, proof: list[str], root: str) -> bool:
+    '''
+    Verify a Merkle Tree proof of inclusion.
+    '''
     proof_length = len(proof)
     val_hash = hash(val)
     for i in range(proof_length):
@@ -19,6 +25,9 @@ def verify_proof(val: str, proof: list[str], root: str) -> bool:
 
 
 class Node:
+    '''
+    Node of a (doubly linked) binary tree.
+    '''
     # TODO: decide if we should have Node(hash(str)) or Node(str) and hash calculated internally
     def __init__(self, value, parent = None, left = None, right = None):
         self.value = value
@@ -28,6 +37,9 @@ class Node:
 
 
 def create_parent(left: Node, right: Node) -> Node:
+    '''
+    Given two Nodes, calculate, set and return their parent.
+    '''
     parent = Node(hash(left.value + right.value))
     left.parent = parent
     right.parent = parent
@@ -45,11 +57,19 @@ class MerkleTree:
         self.root = self.__construct()
 
     def __create_leaves(self) -> list[Node]:
+        '''
+        Create the leaves of a Merkle Tree.
+        '''
         self.leaves = []
         for value in self.values:
             self.leaves.append(Node(hash(value)))
 
     def __construct(self) -> Node:
+        '''
+        Construct a Merkle Tree.
+        - calculate levels
+        - set root
+        '''
         self.__pad()
         cur_level = self.leaves
         while len(cur_level) > 1:
@@ -63,6 +83,9 @@ class MerkleTree:
         return root
     
     def __pad(self):
+        '''
+        Make number of leaves a power of 2 by adding dummy values.
+        '''
         number_of_leaves = len(self.leaves)
         log = math.log2(number_of_leaves)
         # if not a power of 2
@@ -72,6 +95,9 @@ class MerkleTree:
             self.leaves += [Node(hash('dummy')) for i in range(to_append)]
     
     def calculate_proof(self, elem) -> list[str]:
+        '''
+        Calculate Merkle Tree proof.
+        '''
         # find index of element
         try:
             index = self.values.index(elem)
@@ -95,17 +121,23 @@ class MerkleTree:
     
     def concat(self, other_tree) -> Node:
         '''
-        concatenate two merkle trees
-        trees should have the same number of leaves (and be padded)
-        returns new parent
+        Concatenate two Merkle Trees.
+
+        Trees should have the same number of leaves (and be padded).
+
+        Returns new root.
         '''
         left_root = self.root
         right_root = other_tree.root
         parent = create_parent(left_root, right_root)
         self.root = parent
+        # TODO: do we need to return new root?
         return parent
     
     def add_value(self, value: str):
+        '''
+        Add value to Merkle Tree (create new leaf).
+        '''
         # if non-dummy values are already a power of 2
         # so tree is full
         if (self.non_dummy == len(self.leaves)):
@@ -129,9 +161,10 @@ class MerkleTree:
                     parent.value = hash(parent.left.value + node.value)
                 node = node.parent
 
-    # helper that prints the tree
-    # for debugging
     def print(self):
+        '''
+        Helper that prints the tree, for debugging
+        '''
         cur_level = self.leaves
         to_print = []
         while cur_level:
