@@ -19,6 +19,8 @@ class TestMerkleTree(unittest.TestCase):
     four_values = ['hello1', 'hello2', 'hello3', 'hello4']
     val = 'hello1'
     correct_proof = ['87298cc2f31fba73181ea2a9e6ef10dce21ed95e98bdac9c4e1504ea16f486e4', 'a39eedabc3374c61cadd2d9629048fff66df3278d4bdd439011d6a3caf1671d9']
+    three_values = ['hello1', 'hello2', 'hello3']
+    four_values_root_value = '1e278a276e6a4fa4a18754410f165207e6f83d5d407389458a0409ac82fcb834'
     
     def test_hash(self):
         expected_hash = '91e9240f415223982edc345532630710e94a7f52cd5f48f5ee1afc555078f0ab'
@@ -70,7 +72,14 @@ class TestMerkleTree(unittest.TestCase):
         result = m_t.verify_proof('hello1', proof)
         self.assertTrue(result)
 
+    # TODO: test with 1 element
 
+    def test_add_value(self):
+        m_t = merkle_tree.MerkleTree(self.three_values)
+        m_t.add_value('hello4')
+        self.assertEqual(m_t.root.value, self.four_values_root_value)
+
+    # TODO: test add_value with 2 elems
 
 if __name__ == '__main__':
     unittest.main()
