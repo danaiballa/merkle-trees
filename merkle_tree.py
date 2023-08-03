@@ -11,12 +11,12 @@ def hash(m: str) -> str:
     return str(h.digest().hex())
 
 
-def verify_proof(val: str, proof: list[str], root: str) -> bool:
+def verify_proof(value: str, proof: list[str], root: str) -> bool:
     '''
     Verify a Merkle Tree proof of inclusion.
     '''
     proof_length = len(proof)
-    val_hash = hash(val)
+    val_hash = hash(value)
     for i in range(proof_length):
         new_value = val_hash + proof[i]
         val_hash = hash(new_value)
@@ -28,7 +28,6 @@ class Node:
     '''
     Node of a (doubly linked) binary tree.
     '''
-    # TODO: decide if we should have Node(hash(str)) or Node(str) and hash calculated internally
     def __init__(self, value, parent = None, left = None, right = None):
         self.value = value
         self.parent = parent
@@ -115,9 +114,9 @@ class MerkleTree:
             node = parent
         return proof
 
-    # TODO: this function is not that useful. Someone that has the tree can verify inclusion without this function
-    def verify_proof(self, val: str, proof: list[str]) -> bool:
-        return verify_proof(val, proof, self.root.value)
+    # This function is not that useful. Someone that has the tree can verify inclusion without this function
+    def verify_proof(self, value: str, proof: list[str]) -> bool:
+        return verify_proof(value, proof, self.root.value)
     
     def concat(self, other_tree) -> Node:
         '''
