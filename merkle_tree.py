@@ -28,7 +28,7 @@ class Node:
     '''
     Node of a (doubly linked) binary tree.
     '''
-    def __init__(self, value, parent = None, left = None, right = None):
+    def __init__(self, value, parent=None, left=None, right=None):
         self.value = value
         self.parent = parent
         self.left = left
@@ -95,14 +95,14 @@ class MerkleTree:
     
     def calculate_proof(self, elem) -> list[str]:
         '''
-        Calculate Merkle Tree proof.
+        Calculate Merkle Tree proof, for the first element appearing in the tree.
         '''
         # find index of element
         try:
             index = self.values.index(elem)
         except ValueError:
-            print('Error: Element not in Merkle Tree, proof cannot be constructed!')
-            return
+            print('Error: Element not in Merkle Tree, proof cannot be constructed.')
+            raise
         proof = []
         node = self.leaves[index]
         while node.parent:
@@ -179,13 +179,19 @@ class MerkleTree:
                     parent.value = hash(parent.left.value + node.value)
                 node = parent
         except IndexError:
-            print('Error: Index out of range!')
+            print('Error: Index out of range.')
+            raise
 
-    def update_value(self, value: str):
+    def update_value(self, value: str, new_value: str):
         '''
-        Update the value.
+        Update the first appearing value with a new value.
         '''
-        pass
+        try:
+            index = self.values.index(value)
+            self.update_value_at_index(index, new_value)
+        except ValueError:
+            print('Error: Value does not belong to the tree.')
+            raise
 
     def print(self):
         '''

@@ -68,12 +68,18 @@ class TestMerkleTree(unittest.TestCase):
         result = merkle_tree.verify_proof(value, a_wrong_proof, root_value)
         self.assertFalse(result)
 
-    def test_proof_creation(self):
+    def test_calculate_proof(self):
         values = ['hello1', 'hello2', 'hello3', 'hello4']
         m_t = merkle_tree.MerkleTree(values)
         proof = m_t.calculate_proof('hello1')
         correct_proof = ['87298cc2f31fba73181ea2a9e6ef10dce21ed95e98bdac9c4e1504ea16f486e4', 'a39eedabc3374c61cadd2d9629048fff66df3278d4bdd439011d6a3caf1671d9']
         self.assertEqual(proof, correct_proof)
+
+    def test_calculate_proof_error(self):
+        with self.assertRaises(ValueError):
+            values = ['hello1', 'hello2', 'hello3', 'hello4']
+            m_t = merkle_tree.MerkleTree(values)
+            m_t.calculate_proof('dummy')
 
     def test_create_proof_and_verify(self):
         values = ['hello1', 'hello2', 'hello3', 'hello4']
@@ -112,6 +118,28 @@ class TestMerkleTree(unittest.TestCase):
         expected_root_value = '1e278a276e6a4fa4a18754410f165207e6f83d5d407389458a0409ac82fcb834'
         self.assertEqual(m_t.values, expected_new_values)
         self.assertEqual(m_t.root.value, expected_root_value)
+
+    def test_update_value_at_index_error(self):
+        with self.assertRaises(IndexError):
+            values = ['hello1', 'hello2', 'hello3', 'hello4']
+            m_t = merkle_tree.MerkleTree(values)
+            m_t.update_value_at_index(5, 'bar')
+    
+    def test_update_value(self):
+        values = ['hello1', 'hello2', 'foo', 'hello4']
+        m_t = merkle_tree.MerkleTree(values)
+        m_t.update_value('foo', 'hello3')
+        expected_new_values = ['hello1', 'hello2', 'hello3', 'hello4']
+        expected_root_value = '1e278a276e6a4fa4a18754410f165207e6f83d5d407389458a0409ac82fcb834'
+        self.assertEqual(m_t.values, expected_new_values)
+        self.assertEqual(m_t.root.value, expected_root_value)
+
+    def test_update_value_error(self):
+        with self.assertRaises(ValueError):
+            values = ['hello1', 'hello2', 'hello3', 'hello4']
+            m_t = merkle_tree.MerkleTree(values)
+            m_t.update_value('foo', 'bar')
+
 
 if __name__ == '__main__':
     unittest.main()
