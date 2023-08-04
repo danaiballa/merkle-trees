@@ -95,7 +95,7 @@ class MerkleTree:
     
     def calculate_proof(self, elem) -> list[str]:
         '''
-        Calculate Merkle Tree proof, for the first element appearing in the tree.
+        Calculate Merkle Tree proof.
         '''
         # find index of element
         try:
@@ -184,7 +184,7 @@ class MerkleTree:
 
     def update_value(self, value: str, new_value: str):
         '''
-        Update the first appearing value with a new value.
+        Update a value with a new value.
         '''
         try:
             index = self.values.index(value)
