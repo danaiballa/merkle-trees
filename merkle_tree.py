@@ -161,6 +161,32 @@ class MerkleTree:
                     parent.value = hash(parent.left.value + node.value)
                 node = node.parent
 
+    def update_value_at_index(self, index: int, new_value: str):
+        '''
+        Update the value at a given index.
+        '''
+        try:
+            # update values
+            self.values[index] = new_value
+            # update node and path up to root
+            node = self.leaves[index]
+            node.value = hash(new_value)
+            while node.parent:
+                parent = node.parent
+                if node == parent.left:
+                    parent.value = hash(node.value + parent.right.value)
+                else:
+                    parent.value = hash(parent.left.value + node.value)
+                node = parent
+        except IndexError:
+            print('Error: Index out of range!')
+
+    def update_value(self, value: str):
+        '''
+        Update the value.
+        '''
+        pass
+
     def print(self):
         '''
         Helper that prints the tree, for debugging

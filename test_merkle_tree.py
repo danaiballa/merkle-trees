@@ -104,6 +104,15 @@ class TestMerkleTree(unittest.TestCase):
         expected_root_value = '1e278a276e6a4fa4a18754410f165207e6f83d5d407389458a0409ac82fcb834'
         self.assertEqual(m_t_1.root.value, expected_root_value)
 
+    def test_update_value_at_index(self):
+        values = ['hello1', 'hello2', 'foo', 'hello4']
+        m_t = merkle_tree.MerkleTree(values)
+        m_t.update_value_at_index(2, 'hello3')
+        expected_new_values = ['hello1', 'hello2', 'hello3', 'hello4']
+        expected_root_value = '1e278a276e6a4fa4a18754410f165207e6f83d5d407389458a0409ac82fcb834'
+        self.assertEqual(m_t.values, expected_new_values)
+        self.assertEqual(m_t.root.value, expected_root_value)
+
 if __name__ == '__main__':
     unittest.main()
     
