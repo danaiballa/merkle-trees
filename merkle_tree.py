@@ -195,7 +195,7 @@ class MerkleTree:
 
     def print(self):
         '''
-        Helper that prints the tree, for debugging
+        Print all levels of the tree.
         '''
         cur_level = self.leaves
         to_print = []

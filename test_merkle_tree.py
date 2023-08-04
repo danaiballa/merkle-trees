@@ -61,8 +61,8 @@ class TestMerkleTree(unittest.TestCase):
         self.assertTrue(result)
 
     def test_proof_verification_wrong_proof(self):
-        # this is a proof that should not pass verification
         value = 'hello1'
+        # this is a proof that should not pass verification
         a_wrong_proof = ['87298cc2f31fba73181ea2a9e6ef10dce21ed95e98bdac9c4e1504ea16f486e4', '00000']
         root_value = '1e278a276e6a4fa4a18754410f165207e6f83d5d407389458a0409ac82fcb834'
         result = merkle_tree.verify_proof(value, a_wrong_proof, root_value)
