@@ -182,7 +182,7 @@ class MerkleTree:
                     parent.value = hash(parent.left.value + node.value)
                 node = parent
         except IndexError:
-            raise IndexError('Index out of range')
+            raise IndexError('Index out of bounds.')
 
     def print(self):
         '''
