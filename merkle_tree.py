@@ -24,11 +24,11 @@ def verify_proof(value: str, index: int, proof: list[str], root_value: str) -> b
     if index > max_index: return False
 
     cur_hash = hash(value)
-    for value in proof:
+    for elem in proof:
         if index % 2 == 0: # even number, so value is a left child
-            cur_hash = hash(cur_hash + value)
+            cur_hash = hash(cur_hash + elem)
         else:
-            cur_hash = hash(value + cur_hash) 
+            cur_hash = hash(elem + cur_hash) 
         index = index // 2
     return secrets.compare_digest(cur_hash, root_value)
 

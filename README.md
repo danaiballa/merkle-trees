@@ -1,9 +1,13 @@
 # merkle-trees
 Implementation of Merkle Trees for fun :)
 
-## how to run the tests
+## Run the tests
 1. Make sure you have python installed.
-2. For merkle_tree tests: `python -m unittest test_merkle_tree.py` in command line.
+2. For merkle_tree tests
+    ```
+    python -m unittest test_merkle_tree.py
+    ```
+    in command line.
 
 ## module merkle_tree.py
 - create a merkle tree
