@@ -107,15 +107,19 @@ class MerkleTree:
         Calculate Merkle Tree proof.
         '''
         proof = []
-        node = self.leaves[index]
-        while node.parent:
-            parent = node.parent
-            if node == parent.left:
-                proof.append(parent.right.value)
-            else:
-                proof.append(parent.left.value)
-            node = parent
-        return proof
+        try:
+            node = self.leaves[index]
+            while node.parent:
+                parent = node.parent
+                if node == parent.left:
+                    proof.append(parent.right.value)
+                else:
+                    proof.append(parent.left.value)
+                node = parent
+            return proof
+        except IndexError:
+            raise IndexError('Index out of bounds.')
+
     
     def concat(self, other_tree) -> Node:
         '''
