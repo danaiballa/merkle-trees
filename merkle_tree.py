@@ -1,5 +1,6 @@
 import hashlib
 import math
+import secrets
 
 
 def hash(m: str) -> str:
@@ -11,7 +12,7 @@ def hash(m: str) -> str:
     return str(h.digest().hex())
 
 
-def verify_proof(value: str, index: int, proof: list[str], root: str) -> bool:
+def verify_proof(value: str, index: int, proof: list[str], root_value: str) -> bool:
     '''
     Verify a Merkle Tree proof of inclusion.
 
@@ -29,8 +30,7 @@ def verify_proof(value: str, index: int, proof: list[str], root: str) -> bool:
         else:
             cur_hash = hash(value + cur_hash) 
         index = index // 2
-    # line below might not be the best
-    return (cur_hash == root)
+    return secrets.compare_digest(cur_hash, root_value)
 
 
 class Node:
