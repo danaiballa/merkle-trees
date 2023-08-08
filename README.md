@@ -7,8 +7,8 @@ Implementation of Merkle Trees for fun :)
 
 ## module merkle_tree.py
 - create a merkle tree
-- calculate proof-of-inclusion for a value
-- verify proof-of-inclusion given the proof, the root and a value
+- calculate proof-of-inclusion for a value at an index
+- verify proof-of-inclusion given the value, the index, the proof and the root
 - add a value to the merkle tree
 - update a value of the merkle tree
 - print all levels of the merkle tree
