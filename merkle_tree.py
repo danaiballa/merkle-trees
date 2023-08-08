@@ -1,5 +1,6 @@
 import hashlib
 import math
+import secrets
 
 
 def hash(m: str) -> str:
@@ -11,17 +12,25 @@ def hash(m: str) -> str:
     return str(h.digest().hex())
 
 
-def verify_proof(value: str, proof: list[str], root: str) -> bool:
+def verify_proof(value: str, index: int, proof: list[str], root_value: str) -> bool:
     '''
     Verify a Merkle Tree proof of inclusion.
+
+    Indexing starts at 0.
     '''
-    proof_length = len(proof)
-    val_hash = hash(value)
-    for i in range(proof_length):
-        new_value = val_hash + proof[i]
-        val_hash = hash(new_value)
-    # line below might not be the best
-    return (val_hash == root)
+
+    # Make sure index is not out of bounds.
+    max_index = 2**len(proof) - 1
+    if index > max_index: return False
+
+    cur_hash = hash(value)
+    for elem in proof:
+        if index % 2 == 0: # even number, so value is a left child
+            cur_hash = hash(cur_hash + elem)
+        else:
+            cur_hash = hash(elem + cur_hash) 
+        index = index // 2
+    return secrets.compare_digest(cur_hash, root_value)
 
 
 class Node:
@@ -93,30 +102,24 @@ class MerkleTree:
             to_append = closest_power_of_two - number_of_leaves # number of leaves to be added (dummy values)
             self.leaves += [Node(hash('dummy')) for i in range(to_append)]
     
-    def calculate_proof(self, elem) -> list[str]:
+    def calculate_proof(self, index: int) -> list[str]:
         '''
         Calculate Merkle Tree proof.
         '''
-        # find index of element
-        try:
-            index = self.values.index(elem)
-        except ValueError:
-            print('Error: Element not in Merkle Tree, proof cannot be constructed.')
-            raise
         proof = []
-        node = self.leaves[index]
-        while node.parent:
-            parent = node.parent
-            if node == parent.left:
-                proof.append(parent.right.value)
-            else:
-                proof.append(parent.left.value)
-            node = parent
-        return proof
+        try:
+            node = self.leaves[index]
+            while node.parent:
+                parent = node.parent
+                if node == parent.left:
+                    proof.append(parent.right.value)
+                else:
+                    proof.append(parent.left.value)
+                node = parent
+            return proof
+        except IndexError:
+            raise IndexError('Index out of bounds.')
 
-    # This function is not that useful. Someone that has the tree can verify inclusion without this function
-    def verify_proof(self, value: str, proof: list[str]) -> bool:
-        return verify_proof(value, proof, self.root.value)
     
     def concat(self, other_tree) -> Node:
         '''
@@ -179,19 +182,7 @@ class MerkleTree:
                     parent.value = hash(parent.left.value + node.value)
                 node = parent
         except IndexError:
-            print('Error: Index out of range.')
-            raise
-
-    def update_value(self, value: str, new_value: str):
-        '''
-        Update a value with a new value.
-        '''
-        try:
-            index = self.values.index(value)
-            self.update_value_at_index(index, new_value)
-        except ValueError:
-            print('Error: Value does not belong to the tree.')
-            raise
+            raise IndexError('Index out of bounds.')
 
     def print(self):
         '''

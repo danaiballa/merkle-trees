@@ -52,41 +52,85 @@ class TestMerkleTree(unittest.TestCase):
         m_t = merkle_tree.MerkleTree(values)
         self.assertEqual(m_t.root.value, expected_root_value)
     
-    def test_proof_verification_correct_proof(self):
+    def test_proof_verification_correct_proof_1(self):
         # this is proof for hello1
         value = 'hello1'
         correct_proof = ['87298cc2f31fba73181ea2a9e6ef10dce21ed95e98bdac9c4e1504ea16f486e4', 'a39eedabc3374c61cadd2d9629048fff66df3278d4bdd439011d6a3caf1671d9']
         root_value = '1e278a276e6a4fa4a18754410f165207e6f83d5d407389458a0409ac82fcb834'
-        result = merkle_tree.verify_proof(value, correct_proof, root_value)
+        result = merkle_tree.verify_proof(value, 0, correct_proof, root_value)
         self.assertTrue(result)
+
+    def test_proof_verification_correct_proof_2(self):
+        # this is proof for hello2
+        value = 'hello2'
+        correct_proof = ['91e9240f415223982edc345532630710e94a7f52cd5f48f5ee1afc555078f0ab', 'a39eedabc3374c61cadd2d9629048fff66df3278d4bdd439011d6a3caf1671d9']
+        root_value = '1e278a276e6a4fa4a18754410f165207e6f83d5d407389458a0409ac82fcb834'
+        result = merkle_tree.verify_proof(value, 1, correct_proof, root_value)
+        self.assertTrue(result)
+
+    def test_proof_verification_correct_proof_3(self):
+        # this is proof for hello3
+        value = 'hello3'
+        correct_proof = ['e361a57a7406adee653f1dcff660d84f0ca302907747af2a387f67821acfce33', 'e84e52a730f444505656e5fd583982162a09f45cd8ae50661b4ab6717d135e86']
+        root_value = '1e278a276e6a4fa4a18754410f165207e6f83d5d407389458a0409ac82fcb834'
+        result = merkle_tree.verify_proof(value, 2, correct_proof, root_value)
+        self.assertTrue(result)
+
+    def test_proof_verification_correct_proof_4(self):
+        # this is proof for hello4
+        value = 'hello4'
+        correct_proof = ['47ea70cf08872bdb4afad3432b01d963ac7d165f6b575cd72ef47498f4459a90','e84e52a730f444505656e5fd583982162a09f45cd8ae50661b4ab6717d135e86']
+        root_value = '1e278a276e6a4fa4a18754410f165207e6f83d5d407389458a0409ac82fcb834'
+        result = merkle_tree.verify_proof(value, 3, correct_proof, root_value)
+        self.assertTrue(result)
+
+    def test_proof_verification_index_out_of_bounds(self):
+        # this is proof for hello1
+        value = 'hello1'
+        correct_proof = ['87298cc2f31fba73181ea2a9e6ef10dce21ed95e98bdac9c4e1504ea16f486e4', 'a39eedabc3374c61cadd2d9629048fff66df3278d4bdd439011d6a3caf1671d9']
+        root_value = '1e278a276e6a4fa4a18754410f165207e6f83d5d407389458a0409ac82fcb834'
+        result = merkle_tree.verify_proof(value, 4, correct_proof, root_value)
+        self.assertFalse(result)
+
+    def test_proof_verification_wrong_index_1(self):
+        # this is proof for hello1
+        value = 'hello1'
+        correct_proof = ['87298cc2f31fba73181ea2a9e6ef10dce21ed95e98bdac9c4e1504ea16f486e4', 'a39eedabc3374c61cadd2d9629048fff66df3278d4bdd439011d6a3caf1671d9']
+        root_value = '1e278a276e6a4fa4a18754410f165207e6f83d5d407389458a0409ac82fcb834'
+        result = merkle_tree.verify_proof(value, 1, correct_proof, root_value)
+        self.assertFalse(result)
+
+    def test_proof_verification_wrong_index_2(self):
+        # this is proof for hello1
+        value = 'hello1'
+        correct_proof = ['87298cc2f31fba73181ea2a9e6ef10dce21ed95e98bdac9c4e1504ea16f486e4', 'a39eedabc3374c61cadd2d9629048fff66df3278d4bdd439011d6a3caf1671d9']
+        root_value = '1e278a276e6a4fa4a18754410f165207e6f83d5d407389458a0409ac82fcb834'
+        result = merkle_tree.verify_proof(value, 3, correct_proof, root_value)
+        self.assertFalse(result)
 
     def test_proof_verification_wrong_proof(self):
         value = 'hello1'
         # this is a proof that should not pass verification
         a_wrong_proof = ['87298cc2f31fba73181ea2a9e6ef10dce21ed95e98bdac9c4e1504ea16f486e4', '00000']
         root_value = '1e278a276e6a4fa4a18754410f165207e6f83d5d407389458a0409ac82fcb834'
-        result = merkle_tree.verify_proof(value, a_wrong_proof, root_value)
+        result = merkle_tree.verify_proof(value, 0, a_wrong_proof, root_value)
         self.assertFalse(result)
 
     def test_calculate_proof(self):
         values = ['hello1', 'hello2', 'hello3', 'hello4']
         m_t = merkle_tree.MerkleTree(values)
-        proof = m_t.calculate_proof('hello1')
+        proof = m_t.calculate_proof(0)
         correct_proof = ['87298cc2f31fba73181ea2a9e6ef10dce21ed95e98bdac9c4e1504ea16f486e4', 'a39eedabc3374c61cadd2d9629048fff66df3278d4bdd439011d6a3caf1671d9']
         self.assertEqual(proof, correct_proof)
-
-    def test_calculate_proof_error(self):
-        with self.assertRaises(ValueError):
-            values = ['hello1', 'hello2', 'hello3', 'hello4']
-            m_t = merkle_tree.MerkleTree(values)
-            m_t.calculate_proof('dummy')
 
     def test_create_proof_and_verify(self):
         values = ['hello1', 'hello2', 'hello3', 'hello4']
         m_t = merkle_tree.MerkleTree(values)
-        proof = m_t.calculate_proof('hello1')
-        result = m_t.verify_proof('hello1', proof)
-        self.assertTrue(result)
+        root = m_t.root.value
+        for i in range(len(values)):
+            proof = m_t.calculate_proof(i)
+            result = merkle_tree.verify_proof(values[i], i, proof, root)
+            self.assertTrue(result)
 
     def test_add_value_1(self):
         values = ['hello1', 'hello2', 'hello3']
@@ -124,21 +168,6 @@ class TestMerkleTree(unittest.TestCase):
             values = ['hello1', 'hello2', 'hello3', 'hello4']
             m_t = merkle_tree.MerkleTree(values)
             m_t.update_value_at_index(5, 'bar')
-    
-    def test_update_value(self):
-        values = ['hello1', 'hello2', 'foo', 'hello4']
-        m_t = merkle_tree.MerkleTree(values)
-        m_t.update_value('foo', 'hello3')
-        expected_new_values = ['hello1', 'hello2', 'hello3', 'hello4']
-        expected_root_value = '1e278a276e6a4fa4a18754410f165207e6f83d5d407389458a0409ac82fcb834'
-        self.assertEqual(m_t.values, expected_new_values)
-        self.assertEqual(m_t.root.value, expected_root_value)
-
-    def test_update_value_error(self):
-        with self.assertRaises(ValueError):
-            values = ['hello1', 'hello2', 'hello3', 'hello4']
-            m_t = merkle_tree.MerkleTree(values)
-            m_t.update_value('foo', 'bar')
 
 
 if __name__ == '__main__':
