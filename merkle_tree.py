@@ -1,6 +1,5 @@
 import hashlib
 import math
-import secrets
 
 
 def hash(m: str) -> str:
@@ -30,7 +29,7 @@ def verify_proof(value: str, index: int, proof: list[str], root_value: str) -> b
         else:
             cur_hash = hash(elem + cur_hash) 
         index = index // 2
-    return secrets.compare_digest(cur_hash, root_value)
+        return cur_hash == root_value
 
 
 class Node:
