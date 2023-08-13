@@ -29,7 +29,7 @@ def verify_proof(value: str, index: int, proof: list[str], root_value: str) -> b
         else:
             cur_hash = hash(elem + cur_hash) 
         index = index // 2
-        return cur_hash == root_value
+    return cur_hash == root_value
 
 
 class Node:
@@ -101,23 +101,23 @@ class MerkleTree:
             to_append = closest_power_of_two - number_of_leaves # number of leaves to be added (dummy values)
             self.leaves += [Node(hash('dummy')) for i in range(to_append)]
     
-    def calculate_proof(self, index: int) -> list[str]:
+    def calculate_proof(self, value: str, index: int) -> list[str]:
         '''
         Calculate Merkle Tree proof.
         '''
+        if (index > len(self.values) or self.values[index] != value):
+            return ['']
         proof = []
-        try:
-            node = self.leaves[index]
-            while node.parent:
-                parent = node.parent
-                if node == parent.left:
-                    proof.append(parent.right.value)
-                else:
-                    proof.append(parent.left.value)
-                node = parent
-            return proof
-        except IndexError:
-            raise IndexError('Index out of bounds.')
+        node = self.leaves[index]
+        while node.parent:
+            parent = node.parent
+            if node == parent.left:
+                proof.append(parent.right.value)
+            else:
+                proof.append(parent.left.value)
+            node = parent
+        return proof
+
 
     
     def concat(self, other_tree) -> Node:

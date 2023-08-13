@@ -119,18 +119,46 @@ class TestMerkleTree(unittest.TestCase):
     def test_calculate_proof(self):
         values = ['hello1', 'hello2', 'hello3', 'hello4']
         m_t = merkle_tree.MerkleTree(values)
-        proof = m_t.calculate_proof(0)
+        proof = m_t.calculate_proof('hello1', 0)
         correct_proof = ['87298cc2f31fba73181ea2a9e6ef10dce21ed95e98bdac9c4e1504ea16f486e4', 'a39eedabc3374c61cadd2d9629048fff66df3278d4bdd439011d6a3caf1671d9']
         self.assertEqual(proof, correct_proof)
+
+    def test_calculate_proof_wrong_index(self):
+        values = ['hello1', 'hello2', 'hello3', 'hello4']
+        m_t = merkle_tree.MerkleTree(values)
+        proof = m_t.calculate_proof('hello1', 1)
+        self.assertEqual(proof, [''])
+
+    def test_calculate_proof_index_ofb(self):
+        values = ['hello1', 'hello2', 'hello3', 'hello4']
+        m_t = merkle_tree.MerkleTree(values)
+        proof = m_t.calculate_proof('hello1', 5)
+        self.assertEqual(proof, [''])
+
+    def test_calculate_proof_wrong_element(self):
+        values = ['hello1', 'hello2', 'hello3', 'hello4']
+        m_t = merkle_tree.MerkleTree(values)
+        proof = m_t.calculate_proof('hello2', 0)
+        self.assertEqual(proof, [''])
+
 
     def test_create_proof_and_verify(self):
         values = ['hello1', 'hello2', 'hello3', 'hello4']
         m_t = merkle_tree.MerkleTree(values)
         root = m_t.root.value
         for i in range(len(values)):
-            proof = m_t.calculate_proof(i)
+            proof = m_t.calculate_proof(values[i], i)
             result = merkle_tree.verify_proof(values[i], i, proof, root)
             self.assertTrue(result)
+
+    def test_create_proof_and_verify_dummy_proof(self):
+        # here we try to verify a proof-of-inclusion with the dummy proof ['']
+        values = ['hello1', 'hello2', 'hello3', 'hello4']
+        m_t = merkle_tree.MerkleTree(values)
+        root = m_t.root.value
+        for i in range(len(values)):
+            result = merkle_tree.verify_proof(values[i], i, [''], root)
+            self.assertFalse(result)
 
     def test_add_value_1(self):
         values = ['hello1', 'hello2', 'hello3']
