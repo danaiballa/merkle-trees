@@ -16,6 +16,8 @@ import merkle_tree
 
 class TestMerkleTree(unittest.TestCase):
     
+# ------------------- test root creation -------------------
+
     def test_hash(self):
         expected_hash = '91e9240f415223982edc345532630710e94a7f52cd5f48f5ee1afc555078f0ab'
         self.assertEqual(merkle_tree.hash('hello1'), expected_hash)
@@ -51,6 +53,8 @@ class TestMerkleTree(unittest.TestCase):
         expected_root_value = '91e9240f415223982edc345532630710e94a7f52cd5f48f5ee1afc555078f0ab'
         m_t = merkle_tree.MerkleTree(values)
         self.assertEqual(m_t.root.value, expected_root_value)
+
+# ------------------- test proof verification -------------------
     
     def test_proof_verification_correct_proof_1(self):
         # this is proof for hello1
@@ -116,6 +120,8 @@ class TestMerkleTree(unittest.TestCase):
         result = merkle_tree.verify_proof(value, 0, a_wrong_proof, root_value)
         self.assertFalse(result)
 
+# ------------------- test proof creation -------------------
+
     def test_calculate_proof(self):
         values = ['hello1', 'hello2', 'hello3', 'hello4']
         m_t = merkle_tree.MerkleTree(values)
@@ -141,6 +147,7 @@ class TestMerkleTree(unittest.TestCase):
         proof = m_t.calculate_proof('hello2', 0)
         self.assertEqual(proof, [''])
 
+# ------------------- test creation & verification -------------------
 
     def test_create_proof_and_verify(self):
         values = ['hello1', 'hello2', 'hello3', 'hello4']
@@ -160,6 +167,8 @@ class TestMerkleTree(unittest.TestCase):
             result = merkle_tree.verify_proof(values[i], i, [''], root)
             self.assertFalse(result)
 
+# ------------------- test add value -------------------
+
     def test_add_value_1(self):
         values = ['hello1', 'hello2', 'hello3']
         expected_root_value = '1e278a276e6a4fa4a18754410f165207e6f83d5d407389458a0409ac82fcb834'
@@ -173,6 +182,8 @@ class TestMerkleTree(unittest.TestCase):
         m_t = merkle_tree.MerkleTree(values)
         m_t.add_value('hello3')
         self.assertEqual(m_t.root.value, expected_root_value)
+
+# ------------------- test update value -------------------
 
     def test_concat(self):
         values = ['hello1', 'hello2', 'hello3', 'hello4']
