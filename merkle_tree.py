@@ -22,12 +22,12 @@ def verify_proof(value: str, index: int, proof: list[str], root_value: str) -> b
     max_index = 2**len(proof) - 1
     if index > max_index: return False
 
-    cur_hash = hash(value)
+    cur_hash = hash('0' + value)
     for elem in proof:
         if index % 2 == 0: # even number, so value is a left child
-            cur_hash = hash(cur_hash + elem)
+            cur_hash = hash('1' + cur_hash + elem)
         else:
-            cur_hash = hash(elem + cur_hash) 
+            cur_hash = hash('1' + elem + cur_hash) 
         index = index // 2
     return cur_hash == root_value
 
@@ -47,7 +47,7 @@ def create_parent(left: Node, right: Node) -> Node:
     '''
     Given two Nodes, calculate, set and return their parent.
     '''
-    parent = Node(hash(left.value + right.value))
+    parent = Node(hash("1" + left.value + right.value))
     left.parent = parent
     right.parent = parent
     parent.left = left
@@ -66,10 +66,12 @@ class MerkleTree:
     def __create_leaves(self) -> list[Node]:
         '''
         Create the leaves of a Merkle Tree.
+
+        Leaf values are prepended with a "0" before being hashed.
         '''
         self.leaves = []
         for value in self.values:
-            self.leaves.append(Node(hash(value)))
+            self.leaves.append(Node(hash('0'+value)))
 
     def __construct(self) -> Node:
         '''
@@ -99,7 +101,7 @@ class MerkleTree:
         if math.floor(log) != log:
             closest_power_of_two = int(2 ** (math.floor(log) + 1)) # number of leaves it should have
             to_append = closest_power_of_two - number_of_leaves # number of leaves to be added (dummy values)
-            self.leaves += [Node(hash('dummy')) for i in range(to_append)]
+            self.leaves += [Node(hash('0'+'dummy')) for i in range(to_append)]
     
     def calculate_proof(self, value: str, index: int) -> list[str]:
         '''
@@ -150,7 +152,7 @@ class MerkleTree:
         else:
             # replace a dummy value with the new value
             index = self.non_dummy
-            self.leaves[index].value = hash(value)
+            self.leaves[index].value = hash('0'+value)
             self.values.append(value)
             self.non_dummy += 1
             # re-calculate hashes
@@ -158,9 +160,9 @@ class MerkleTree:
             while node.parent:
                 parent = node.parent
                 if node == parent.left:
-                    parent.value = hash(node.value + parent.right.value)
+                    parent.value = hash('1' + node.value + parent.right.value)
                 else:
-                    parent.value = hash(parent.left.value + node.value)
+                    parent.value = hash('1' + parent.left.value + node.value)
                 node = node.parent
 
     def update_value_at_index(self, index: int, new_value: str):
@@ -172,13 +174,13 @@ class MerkleTree:
             self.values[index] = new_value
             # update node and path up to root
             node = self.leaves[index]
-            node.value = hash(new_value)
+            node.value = hash('0' + new_value)
             while node.parent:
                 parent = node.parent
                 if node == parent.left:
-                    parent.value = hash(node.value + parent.right.value)
+                    parent.value = hash('1' + node.value + parent.right.value)
                 else:
-                    parent.value = hash(parent.left.value + node.value)
+                    parent.value = hash('1' + parent.left.value + node.value)
                 node = parent
         except IndexError:
             raise IndexError('Index out of bounds.')
