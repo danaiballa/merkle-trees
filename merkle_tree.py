@@ -22,12 +22,15 @@ def verify_proof(value: str, index: int, proof: list[str], root_value: str) -> b
     max_index = 2**len(proof) - 1
     if index > max_index: return False
 
-    cur_hash = hash('0' + value)
+    level = 0
+
+    cur_hash = hash(str(level) + value)
     for elem in proof:
+        level += 1
         if index % 2 == 0: # even number, so value is a left child
-            cur_hash = hash('1' + cur_hash + elem)
+            cur_hash = hash(str(level) + cur_hash + elem)
         else:
-            cur_hash = hash('1' + elem + cur_hash) 
+            cur_hash = hash(str(level) + elem + cur_hash) 
         index = index // 2
     return cur_hash == root_value
 
@@ -36,18 +39,19 @@ class Node:
     '''
     Node of a (doubly linked) binary tree.
     '''
-    def __init__(self, value, parent=None, left=None, right=None):
+    def __init__(self, value, parent=None, left=None, right=None, level=0):
         self.value = value
         self.parent = parent
         self.left = left
         self.right = right
+        self.level = level
 
 
 def create_parent(left: Node, right: Node) -> Node:
     '''
     Given two Nodes, calculate, set and return their parent.
     '''
-    parent = Node(hash("1" + left.value + right.value))
+    parent = Node(value=hash(str(left.level+1) + left.value + right.value), level=left.level+1)
     left.parent = parent
     right.parent = parent
     parent.left = left
@@ -62,6 +66,7 @@ class MerkleTree:
         self.non_dummy = len(values)
         self.__create_leaves()
         self.root = self.__construct()
+        self.height = self.root.level
 
     def __create_leaves(self) -> list[Node]:
         '''
@@ -71,6 +76,7 @@ class MerkleTree:
         '''
         self.leaves = []
         for value in self.values:
+            # TODO: put this into Node constructor
             self.leaves.append(Node(hash('0'+value)))
 
     def __construct(self) -> Node:
@@ -122,68 +128,68 @@ class MerkleTree:
 
 
     
-    def concat(self, other_tree) -> Node:
-        '''
-        Concatenate two Merkle Trees.
+    # def concat(self, other_tree) -> Node:
+    #     '''
+    #     Concatenate two Merkle Trees.
 
-        Trees should have the same number of leaves (and be padded).
+    #     Trees should have the same number of leaves (and be padded).
 
-        Returns new root.
-        '''
-        left_root = self.root
-        right_root = other_tree.root
-        parent = create_parent(left_root, right_root)
-        self.root = parent
-        self.leaves += other_tree.leaves
-        self.values += other_tree.values
-        self.non_dummy += other_tree.non_dummy
+    #     Returns new root.
+    #     '''
+    #     left_root = self.root
+    #     right_root = other_tree.root
+    #     parent = create_parent(left_root, right_root)
+    #     self.root = parent
+    #     self.leaves += other_tree.leaves
+    #     self.values += other_tree.values
+    #     self.non_dummy += other_tree.non_dummy
     
-    def add_value(self, value: str):
-        '''
-        Add value to Merkle Tree (create new leaf).
-        '''
-        # if non-dummy values are already a power of 2
-        # so tree is full
-        if (self.non_dummy == len(self.leaves)):
-            # construct a new merkle tree and concatenate the two
-            new_tree = MerkleTree([value] + ['dummy' for i in range(len(self.leaves) - 1)])
-            # concat new tree to old tree
-            self.concat(new_tree)
-        else:
-            # replace a dummy value with the new value
-            index = self.non_dummy
-            self.leaves[index].value = hash('0'+value)
-            self.values.append(value)
-            self.non_dummy += 1
-            # re-calculate hashes
-            node = self.leaves[index]
-            while node.parent:
-                parent = node.parent
-                if node == parent.left:
-                    parent.value = hash('1' + node.value + parent.right.value)
-                else:
-                    parent.value = hash('1' + parent.left.value + node.value)
-                node = node.parent
+    # def add_value(self, value: str):
+    #     '''
+    #     Add value to Merkle Tree (create new leaf).
+    #     '''
+    #     # if non-dummy values are already a power of 2
+    #     # so tree is full
+    #     if (self.non_dummy == len(self.leaves)):
+    #         # construct a new merkle tree and concatenate the two
+    #         new_tree = MerkleTree([value] + ['dummy' for i in range(len(self.leaves) - 1)])
+    #         # concat new tree to old tree
+    #         self.concat(new_tree)
+    #     else:
+    #         # replace a dummy value with the new value
+    #         index = self.non_dummy
+    #         self.leaves[index].value = hash('0'+value)
+    #         self.values.append(value)
+    #         self.non_dummy += 1
+    #         # re-calculate hashes
+    #         node = self.leaves[index]
+    #         while node.parent:
+    #             parent = node.parent
+    #             if node == parent.left:
+    #                 parent.value = hash('1' + node.value + parent.right.value)
+    #             else:
+    #                 parent.value = hash('1' + parent.left.value + node.value)
+    #             node = node.parent
 
-    def update_value_at_index(self, index: int, new_value: str):
-        '''
-        Update the value at a given index.
-        '''
-        try:
-            # update values
-            self.values[index] = new_value
-            # update node and path up to root
-            node = self.leaves[index]
-            node.value = hash('0' + new_value)
-            while node.parent:
-                parent = node.parent
-                if node == parent.left:
-                    parent.value = hash('1' + node.value + parent.right.value)
-                else:
-                    parent.value = hash('1' + parent.left.value + node.value)
-                node = parent
-        except IndexError:
-            raise IndexError('Index out of bounds.')
+    # def update_value_at_index(self, index: int, new_value: str):
+    #     '''
+    #     Update the value at a given index.
+    #     '''
+    #     try:
+    #         # update values
+    #         self.values[index] = new_value
+    #         # update node and path up to root
+    #         node = self.leaves[index]
+    #         node.value = hash('0' + new_value)
+    #         while node.parent:
+    #             parent = node.parent
+    #             if node == parent.left:
+    #                 parent.value = hash('1' + node.value + parent.right.value)
+    #             else:
+    #                 parent.value = hash('1' + parent.left.value + node.value)
+    #             node = parent
+    #     except IndexError:
+    #         raise IndexError('Index out of bounds.')
 
     def print(self):
         '''
